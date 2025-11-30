@@ -10,6 +10,7 @@ public class MtsMainPage {
     private final WebDriver driver;
     private final WebDriverWait wait;
 
+
     public static final By BLOCK_TITLE = By.xpath("//h2[contains(text(), 'Онлайн пополнение')]");
     public static final By PAY_PARTNERS = By.cssSelector(".pay-partners");
     public static final By MORE_INFO_LINK = By.xpath("//a[contains(text(), 'Подробнее о сервисе')]");
