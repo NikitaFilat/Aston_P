@@ -36,16 +36,13 @@ public class MtsWebTest {
         driver = new ChromeDriver();
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-        // Настройки браузера
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
 
-        // Открытие сайта
         System.out.println("Opening MTS website...");
         driver.get("https://mts.by");
 
-        // Проверка загрузки
         wait.until(d -> {
             String title = d.getTitle().toLowerCase();
             return title.contains("мтс") || title.contains("mts");
@@ -67,7 +64,6 @@ public class MtsWebTest {
     public void testBlockElements() {
         System.out.println("=== Running testBlockElements ===");
 
-        // Проверка заголовка
         WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(MtsMainPage.BLOCK_TITLE));
         String titleText = title.getText();
         System.out.println("Found title: " + titleText);
@@ -75,7 +71,6 @@ public class MtsWebTest {
         assertTrue(titleText.contains("Онлайн пополнение"),
                 "Заголовок должен содержать 'Онлайн пополнение'");
 
-        // Проверка логотипов партнеров
         try {
             List<WebElement> logos = driver.findElements(MtsMainPage.PAY_PARTNERS);
             if (!logos.isEmpty()) {
@@ -88,7 +83,6 @@ public class MtsWebTest {
             System.out.println("Error checking partner logos: " + e.getMessage());
         }
 
-        // Проверка ссылки "Подробнее"
         try {
             WebElement moreInfoLink = wait.until(ExpectedConditions.elementToBeClickable(MtsMainPage.MORE_INFO_LINK));
             System.out.println("More info link found: " + moreInfoLink.getText());
@@ -96,7 +90,6 @@ public class MtsWebTest {
             String originalUrl = driver.getCurrentUrl();
             moreInfoLink.click();
 
-            // Ждем изменения URL
             wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(originalUrl)));
             assertTrue(driver.getCurrentUrl().contains("mts"),
                     "После клика должна загрузиться страница МТС");
@@ -118,7 +111,6 @@ public class MtsWebTest {
     public void testPlaceholders() {
         System.out.println("=== Running testPlaceholders ===");
 
-        // Проверяем placeholder для мобильной связи
         String phonePlaceholder = mainPage.getPhonePlaceholder();
         System.out.println("Phone placeholder: " + phonePlaceholder);
         assertEquals("Номер телефона", phonePlaceholder,
@@ -141,10 +133,8 @@ public class MtsWebTest {
     public void testPaymentWindow() {
         System.out.println("=== Running testPaymentWindow ===");
 
-        // Вводим данные на текущей вкладке (Услуги связи)
         mainPage.enterMobileData(TEST_PHONE, TEST_SUM);
 
-        // Добавим паузу перед кликом для стабильности
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
@@ -153,14 +143,12 @@ public class MtsWebTest {
 
         mainPage.clickContinue();
 
-        // Работаем с платежным фреймом
         MtsPaymentFrame frame = new MtsPaymentFrame(driver);
 
         try {
             frame.switchToFrame();
             System.out.println("Successfully switched to payment frame");
 
-            // Проверяем данные в фрейме
             String phoneInFrame = frame.getPhone();
             System.out.println("Phone in frame: " + phoneInFrame);
 
@@ -170,7 +158,6 @@ public class MtsWebTest {
             String buttonText = frame.getButtonText();
             System.out.println("Button text: " + buttonText);
 
-            // ГИБКИЕ ПРОВЕРКИ
             boolean phoneFound = !phoneInFrame.equals("Phone not available");
             boolean sumFound = !sumInFrame.equals("Sum not available");
 
@@ -188,12 +175,10 @@ public class MtsWebTest {
                 System.out.println("Sum not found in frame, skipping sum validation");
             }
 
-            // Проверяем кнопку оплаты
             assertTrue(buttonText.contains("Оплатить") || buttonText.contains("Pay") ||
                             buttonText.equals("Pay button not available"),
                     "Текст кнопки должен содержать 'Оплатить' или 'Pay'");
 
-            // Проверяем поля карты
             String cardPlaceholder = frame.getCardPlaceholder();
             String datePlaceholder = frame.getDatePlaceholder();
             String cvcPlaceholder = frame.getCVCPlaceholder();
@@ -206,7 +191,6 @@ public class MtsWebTest {
                             cardPlaceholder.equals("Номер карты"),
                     "Placeholder карты должен содержать 'карт' или 'card'");
 
-            // Проверяем иконки платежных систем
             List<WebElement> icons = frame.getIcons();
             System.out.println("Found " + icons.size() + " payment icons");
 
